@@ -19,27 +19,20 @@ class gracefulCut
 {
 	public static function publicBeforeContentFilter($core,$tag,$args)
 	{
-		// Check if we need to cope with filters (cut_string present, remove_html optional)
-		if (!empty($args['cut_string']) && (integer) $attr['cut_string'] > 0) {
-			$args[] = $args[0];
-			$args[] = 'graceful_cut';
+		// graceful_cut take place of cut_string, but only if no encode_xml or encode_html
+		if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
+			if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
+				(!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
+					$args['graceful_cut'] = $arg['cut_string'];
+					$args['cut_string'] = 0;
+				}
 		}
 	}
 	public static function publicAfterContentFilter($core,$tag,$args)
 	{
-		if ($args[count($args)-1] === 'graceful_cut') {
-			$html = true;
-			// Remove graceful_cut flag
-			array_pop($args);
-			// Get the original string
-			$str = array_pop($args);
-			if ((integer) !empty($attr['remove_html'])) {
-				$str = context::remove_html($str);
-				$str = preg_replace('/\s+/',' ',$str);
-				$html = false;
-			}
-			$str = self::graceful_cut($str,(integer)$args['cut_string'],$html);
-			$args[0] = $str;
+		if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
+			// graceful_cut attribute in tag
+			$args[0] = self::graceful_cut($args[0],(integer)$args['graceful_cut'],true);
 		}
 	}
 

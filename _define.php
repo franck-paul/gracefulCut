@@ -14,10 +14,11 @@ if (!defined('DC_RC_PATH')) { return; }
 
 $this->registerModule(
 	/* Name */				"gracefulCut",
-	/* Description*/		"Gracefully cut_string filter replacement for Dotclear templates",
+	/* Description*/		"Gracefully cut_string filter alternative for Dotclear templates",
 	/* Author */			"Franck Paul",
 	/* Version */			'0.1',
 	array(
+		/* Dependencies */	'requires' 		=>	array(array('core','2.11')),
 		/* Permissions */	'permissions'	=>	'admin',
 		/* Type */			'type'			=>	'plugin'
 	)
