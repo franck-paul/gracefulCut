@@ -22,10 +22,13 @@ class gracefulCut
 		// graceful_cut take place of cut_string, but only if no encode_xml or encode_html
 		if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
 			if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
-				(!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
-					$args['graceful_cut'] = $arg['cut_string'];
-					$args['cut_string'] = 0;
-				}
+				(!isset($args['encode_html']) || (integer) $args['encode_html'] == 0))
+			{
+				// Get required length from cut_string
+				$args['graceful_cut'] = $arg['cut_string'];
+				// Cancel cut_string filter
+				$args['cut_string'] = 0;
+			}
 		}
 	}
 	public static function publicAfterContentFilter($core,$tag,$args)
