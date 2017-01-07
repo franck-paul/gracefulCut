@@ -15,6 +15,8 @@ if (!defined('DC_RC_PATH')) { return; }
 $core->addBehavior('publicBeforeContentFilter', array('gracefulCut','publicBeforeContentFilter'));
 $core->addBehavior('publicAfterContentFilter', array('gracefulCut','publicAfterContentFilter'));
 
+$core->tpl->addBlock('IfGracefulCut',array('gracefulCut','IfGracefulCut'));
+
 class gracefulCut
 {
 	public static function publicBeforeContentFilter($core,$tag,$args)
@@ -25,7 +27,7 @@ class gracefulCut
 				(!isset($args['encode_html']) || (integer) $args['encode_html'] == 0))
 			{
 				// Get required length from cut_string
-				$args['graceful_cut'] = $arg['cut_string'];
+				$args['graceful_cut'] = $args['cut_string'];
 				// Cancel cut_string filter
 				$args['cut_string'] = 0;
 			}
@@ -37,6 +39,39 @@ class gracefulCut
 			// graceful_cut attribute in tag
 			$args[0] = self::graceful_cut($args[0],(integer)$args['graceful_cut'],true);
 		}
+	}
+
+	public static function IfGracefulCut($attr,$content)
+	{
+		global $core;
+
+		if ((empty($attr['cut_string']) && empty($attr['graceful_cut'])) || !empty($attr['full'])) {
+			return '';
+		}
+
+		$urls = '0';
+		if (!empty($attr['absolute_urls'])) {
+			$urls = '1';
+		}
+
+		// Get short version of content
+		$short = $core->tpl->getFilters($attr);
+
+		// Get full version of content
+		$cut = isset($attr['cut_string']) ? $attr['cut_string'] : 0;
+		$gcut = isset($attr['graceful_cut']) ? $attr['graceful_cut'] : 0;
+		$attr['cut_string'] = 0;
+		$attr['graceful_cut'] = 0;
+		$full = $core->tpl->getFilters($attr);
+
+		// Restore args
+		$attr['cut_string'] = $cut;
+		$attr['graceful_cut'] = $gcut;
+
+		return '<?php if (strlen('.sprintf($full,'$_ctx->posts->getContent('.$urls.')').') > '.
+			'strlen('.sprintf($short,'$_ctx->posts->getContent('.$urls.')').')) : ?>'.
+			$content.
+			'<?php endif; ?>';
 	}
 
 	/**
