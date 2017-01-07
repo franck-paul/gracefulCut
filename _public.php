@@ -12,8 +12,8 @@
 
 if (!defined('DC_RC_PATH')) { return; }
 
-$core->addBehavior('publicBeforeContentFilter', array('gracefulCut','publicBeforeContentFilter'));
-$core->addBehavior('publicAfterContentFilter', array('gracefulCut','publicAfterContentFilter'));
+$core->addBehavior('publicBeforeContentFilter',array('gracefulCut','publicBeforeContentFilter'));
+$core->addBehavior('publicAfterContentFilter',array('gracefulCut','publicAfterContentFilter'));
 
 $core->tpl->addBlock('IfGracefulCut',array('gracefulCut','IfGracefulCut'));
 
@@ -29,15 +29,20 @@ class gracefulCut
 				// Get required length from cut_string
 				$args['graceful_cut'] = $args['cut_string'];
 				// Cancel cut_string filter
-				$args['cut_string'] = 0;
+				$args['cut_string'] = -1;
 			}
 		}
 	}
+
 	public static function publicAfterContentFilter($core,$tag,$args)
 	{
 		if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
 			// graceful_cut attribute in tag
 			$args[0] = self::graceful_cut($args[0],(integer)$args['graceful_cut'],true);
+			if ($args['cut_string'] == -1) {
+				// Restore initial value
+				$args['cut_string='] = $args['graceful_cut'];
+			}
 		}
 	}
 
