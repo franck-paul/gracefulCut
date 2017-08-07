@@ -12,37 +12,17 @@
 
 if (!defined('DC_RC_PATH')) { return; }
 
-$core->addBehavior('publicBeforeContentFilter',array('gracefulCut','publicBeforeContentFilter'));
 $core->addBehavior('publicAfterContentFilter',array('gracefulCut','publicAfterContentFilter'));
 
 $core->tpl->addBlock('IfGracefulCut',array('gracefulCut','IfGracefulCut'));
 
 class gracefulCut
 {
-	public static function publicBeforeContentFilter($core,$tag,$args)
-	{
-		// graceful_cut take place of cut_string, but only if no encode_xml or encode_html
-		if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
-			if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
-				(!isset($args['encode_html']) || (integer) $args['encode_html'] == 0))
-			{
-				// Get required length from cut_string
-				$args['graceful_cut'] = $args['cut_string'];
-				// Cancel cut_string filter
-				$args['cut_string'] = -1;
-			}
-		}
-	}
-
 	public static function publicAfterContentFilter($core,$tag,$args)
 	{
 		if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
 			// graceful_cut attribute in tag
 			$args[0] = self::graceful_cut($args[0],(integer)$args['graceful_cut'],true);
-			if ($args['cut_string'] == -1) {
-				// Restore initial value
-				$args['cut_string='] = $args['graceful_cut'];
-			}
 		}
 	}
 
