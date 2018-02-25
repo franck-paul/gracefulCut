@@ -10,16 +10,16 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 # -- END LICENSE BLOCK ------------------------------------
 
-if (!defined('DC_RC_PATH')) { return; }
+if (!defined('DC_RC_PATH')) {return;}
 
 $this->registerModule(
-	/* Name */				"gracefulCut",
-	/* Description*/		"Gracefully cut_string filter alternative for Dotclear templates",
-	/* Author */			"Franck Paul",
-	/* Version */			'0.2',
-	array(
-		/* Dependencies */	'requires' 		=>	array(array('core','2.11')),
-		/* Permissions */	'permissions'	=>	'admin',
-		/* Type */			'type'			=>	'plugin'
-	)
+    'gracefulCut',                                                     // Name
+    'Gracefully cut_string filter alternative for Dotclear templates', // Description
+    'Franck Paul',                                                     // Author
+    '0.3',                                                             // Version
+    array(
+        'requires'    => array(array('core', '2.14')),
+        'permissions' => 'admin',
+        'type'        => 'plugin'
+    )
 );
