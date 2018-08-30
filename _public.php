@@ -13,23 +13,25 @@
 
 if (!defined('DC_RC_PATH')) {return;}
 
-$core->addBehavior('publicBeforeContentFilter', array('gracefulCut', 'publicBeforeContentFilter'));
+$core->addBehavior('publicContentFilter', array('gracefulCut', 'publicContentFilter'));
 $core->addBehavior('publicAfterContentFilter', array('gracefulCut', 'publicAfterContentFilter'));
 
 $core->tpl->addBlock('IfGracefulCut', array('gracefulCut', 'IfGracefulCut'));
 
 class gracefulCut
 {
-    public static function publicBeforeContentFilter($core, $tag, $args)
+    public static function publicContentFilter($core, $tag, $args, $filter)
     {
-        // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
-        if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
-            if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
-                (!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
-                // Get required length from cut_string
-                $args->offsetSet('graceful_cut', $args['cut_string']);
-                // Cancel cut_string filter
-                $args['cut_string'] = -1;
+        if ($filter == 'cut_string') {
+            // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
+            if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
+                if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
+                    (!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
+                    // graceful_cut with cut_string length
+                    $args[0] = self::graceful_cut($args[0], (integer) $args['cut_string'], true);
+                    // then stop applying default cut_string filter
+                    return '1';
+                }
             }
         }
     }
@@ -39,10 +41,6 @@ class gracefulCut
         if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
             // graceful_cut attribute in tag
             $args[0] = self::graceful_cut($args[0], (integer) $args['graceful_cut'], true);
-            if ($args['cut_string'] == -1) {
-                // Restore initial value
-                $args['cut_string'] = $args['graceful_cut'];
-            }
         }
     }
 
