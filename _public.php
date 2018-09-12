@@ -13,10 +13,10 @@
 
 if (!defined('DC_RC_PATH')) {return;}
 
-$core->addBehavior('publicContentFilter', array('gracefulCut', 'publicContentFilter'));
-$core->addBehavior('publicAfterContentFilter', array('gracefulCut', 'publicAfterContentFilter'));
+$core->addBehavior('publicContentFilter', ['gracefulCut', 'publicContentFilter']);
+$core->addBehavior('publicAfterContentFilter', ['gracefulCut', 'publicAfterContentFilter']);
 
-$core->tpl->addBlock('IfGracefulCut', array('gracefulCut', 'IfGracefulCut'));
+$core->tpl->addBlock('IfGracefulCut', ['gracefulCut', 'IfGracefulCut']);
 
 class gracefulCut
 {
@@ -111,7 +111,7 @@ class gracefulCut
             // splits all html-tags to scanable lines
             preg_match_all('/(<.+?>)?([^<>]*)/s', $str, $lines, PREG_SET_ORDER);
             $total_length = strlen($ending);
-            $open_tags    = array();
+            $open_tags    = [];
             $truncate     = '';
             foreach ($lines as $line_matchings) {
                 // if there is any html-tag in this line, handle it and add it (uncounted) to the output

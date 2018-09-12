@@ -18,9 +18,9 @@ $this->registerModule(
     'Gracefully cut_string filter alternative for Dotclear templates', // Description
     'Franck Paul',                                                     // Author
     '0.3',                                                             // Version
-    array(
-        'requires'    => array(array('core', '2.15')),
+    [
+        'requires'    => [['core', '2.15']],
         'permissions' => 'admin',
         'type'        => 'plugin'
-    )
+    ]
 );
