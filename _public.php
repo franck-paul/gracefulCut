@@ -10,14 +10,32 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+
 if (!defined('DC_RC_PATH')) {return;}
 
-$core->addBehavior('publicAfterContentFilter', array('gracefulCut', 'publicAfterContentFilter'));
+$core->addBehavior('publicContentFilter', ['gracefulCut', 'publicContentFilter']);
+$core->addBehavior('publicAfterContentFilter', ['gracefulCut', 'publicAfterContentFilter']);
 
-$core->tpl->addBlock('IfGracefulCut', array('gracefulCut', 'IfGracefulCut'));
+$core->tpl->addBlock('IfGracefulCut', ['gracefulCut', 'IfGracefulCut']);
 
 class gracefulCut
 {
+    public static function publicContentFilter($core, $tag, $args, $filter)
+    {
+        if ($filter == 'cut_string') {
+            // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
+            if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
+                if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
+                    (!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
+                    // graceful_cut with cut_string length
+                    $args[0] = self::graceful_cut($args[0], (integer) $args['cut_string'], true);
+                    // then stop applying default cut_string filter
+                    return '1';
+                }
+            }
+        }
+    }
+
     public static function publicAfterContentFilter($core, $tag, $args)
     {
         if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
@@ -43,15 +61,23 @@ class gracefulCut
         $short = $core->tpl->getFilters($attr);
 
         // Get full version of content
-        $cut                  = isset($attr['cut_string']) ? $attr['cut_string'] : 0;
-        $gcut                 = isset($attr['graceful_cut']) ? $attr['graceful_cut'] : 0;
+        $cut  = isset($attr['cut_string']) ? $attr['cut_string'] : 0;
+        $gcut = isset($attr['graceful_cut']) ? $attr['graceful_cut'] : 0;
+        if ($cut) {
         $attr['cut_string']   = 0;
+        }
+        if ($gcut) {
         $attr['graceful_cut'] = 0;
+        }
         $full                 = $core->tpl->getFilters($attr);
 
         // Restore args
+        if ($cut) {
         $attr['cut_string']   = $cut;
+        }
+        if ($gcut) {
         $attr['graceful_cut'] = $gcut;
+        }
 
         return '<?php if (strlen(' . sprintf($full, '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
         'strlen(' . sprintf($short, '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
@@ -85,7 +111,7 @@ class gracefulCut
             // splits all html-tags to scanable lines
             preg_match_all('/(<.+?>)?([^<>]*)/s', $str, $lines, PREG_SET_ORDER);
             $total_length = strlen($ending);
-            $open_tags    = array();
+            $open_tags    = [];
             $truncate     = '';
             foreach ($lines as $line_matchings) {
                 // if there is any html-tag in this line, handle it and add it (uncounted) to the output
