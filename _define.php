@@ -21,6 +21,8 @@ $this->registerModule(
     [
         'requires'    => [['core', '2.15']],
         'permissions' => 'admin',
-        'type'        => 'plugin'
+        'type'        => 'plugin',
+        'details'     => 'https://open-time.net/?q=gracefulCut',       // Details URL
+        'support'     => 'https://github.com/franck-paul/gracefulCut' // Support URL
     ]
 );
