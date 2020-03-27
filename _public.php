@@ -64,19 +64,19 @@ class gracefulCut
         $cut  = isset($attr['cut_string']) ? $attr['cut_string'] : 0;
         $gcut = isset($attr['graceful_cut']) ? $attr['graceful_cut'] : 0;
         if ($cut) {
-        $attr['cut_string']   = 0;
+            $attr['cut_string'] = 0;
         }
         if ($gcut) {
-        $attr['graceful_cut'] = 0;
+            $attr['graceful_cut'] = 0;
         }
-        $full                 = $core->tpl->getFilters($attr);
+        $full = $core->tpl->getFilters($attr);
 
         // Restore args
         if ($cut) {
-        $attr['cut_string']   = $cut;
+            $attr['cut_string'] = $cut;
         }
         if ($gcut) {
-        $attr['graceful_cut'] = $gcut;
+            $attr['graceful_cut'] = $gcut;
         }
 
         return '<?php if (strlen(' . sprintf($full, '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
