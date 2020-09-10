@@ -48,7 +48,7 @@ class gracefulCut
     {
         global $core;
 
-        if ((empty($attr['cut_string']) && empty($attr['graceful_cut'])) || !empty($attr['full'])) {
+        if (empty($attr['cut_string']) && empty($attr['graceful_cut'])) {
             return '';
         }
 
@@ -83,6 +83,26 @@ class gracefulCut
         'strlen(' . sprintf($short, '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
             $content .
             '<?php endif; ?>';
+
+        if (!empty($attr['full'])) {
+            return '<?php if (strlen(' . sprintf($full,
+                    '$_ctx->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen($_ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
+                'strlen(' . sprintf($short,
+                    '$_ctx->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen($_ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
+                $content .
+                '<?php endif; ?>';
+        } else {
+            return '<?php if (strlen(' . sprintf($full,
+                    '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
+                'strlen(' . sprintf($short,
+                    '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
+                $content .
+                '<?php endif; ?>';
+        }
     }
 
     /**
