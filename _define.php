@@ -18,14 +18,14 @@ $this->registerModule(
     'gracefulCut',                                                     // Name
     'Gracefully cut_string filter alternative for Dotclear templates', // Description
     'Franck Paul',                                                     // Author
-    '0.3.1',                                                           // Version
+    '0.4',
     [
-        'requires'    => [['core', '2.15']],
+        'requires'    => [['core', '2.23']],
         'permissions' => 'admin',
         'type'        => 'plugin',
 
         'details'    => 'https://open-time.net/?q=gracefulCut',       // Details URL
         'support'    => 'https://github.com/franck-paul/gracefulCut', // Support URL
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/gracefulCut/master/dcstore.xml'
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/gracefulCut/master/dcstore.xml',
     ]
 );

@@ -10,25 +10,25 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+if (!defined('DC_RC_PATH')) {
+    return;
+}
 
-if (!defined('DC_RC_PATH')) {return;}
+dcCore::app()->addBehavior('publicContentFilter', ['gracefulCut', 'publicContentFilter']);
+dcCore::app()->addBehavior('publicAfterContentFilter', ['gracefulCut', 'publicAfterContentFilter']);
 
-$core->addBehavior('publicContentFilter', ['gracefulCut', 'publicContentFilter']);
-$core->addBehavior('publicAfterContentFilter', ['gracefulCut', 'publicAfterContentFilter']);
-
-$core->tpl->addBlock('IfGracefulCut', ['gracefulCut', 'IfGracefulCut']);
+dcCore::app()->tpl->addBlock('IfGracefulCut', ['gracefulCut', 'IfGracefulCut']);
 
 class gracefulCut
 {
-    public static function publicContentFilter($core, $tag, $args, $filter)
+    public static function publicContentFilter($core = null, $tag, $args, $filter)
     {
         if ($filter == 'cut_string') {
             // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
-            if (isset($args['cut_string']) && (integer) $args['cut_string'] > 0) {
-                if ((!isset($args['encode_xml']) || (integer) $args['encode_xml'] == 0) &&
-                    (!isset($args['encode_html']) || (integer) $args['encode_html'] == 0)) {
+            if (isset($args['cut_string']) && (int) $args['cut_string'] > 0) {
+                if ((!isset($args['encode_xml']) || (int) $args['encode_xml'] == 0) && (!isset($args['encode_html']) || (int) $args['encode_html'] == 0)) {
                     // graceful_cut with cut_string length
-                    $args[0] = self::graceful_cut($args[0], (integer) $args['cut_string'], true);
+                    $args[0] = self::graceful_cut($args[0], (int) $args['cut_string'], true);
                     // then stop applying default cut_string filter
                     return '1';
                 }
@@ -36,18 +36,16 @@ class gracefulCut
         }
     }
 
-    public static function publicAfterContentFilter($core, $tag, $args)
+    public static function publicAfterContentFilter($core = null, $tag, $args)
     {
-        if (isset($args['graceful_cut']) && (integer) $args['graceful_cut'] > 0) {
+        if (isset($args['graceful_cut']) && (int) $args['graceful_cut'] > 0) {
             // graceful_cut attribute in tag
-            $args[0] = self::graceful_cut($args[0], (integer) $args['graceful_cut'], true);
+            $args[0] = self::graceful_cut($args[0], (int) $args['graceful_cut'], true);
         }
     }
 
     public static function IfGracefulCut($attr, $content)
     {
-        global $core;
-
         if (empty($attr['cut_string']) && empty($attr['graceful_cut'])) {
             return '';
         }
@@ -58,18 +56,18 @@ class gracefulCut
         }
 
         // Get short version of content
-        $short = $core->tpl->getFilters($attr);
+        $short = dcCore::app()->tpl->getFilters($attr);
 
         // Get full version of content
-        $cut  = isset($attr['cut_string']) ? $attr['cut_string'] : 0;
-        $gcut = isset($attr['graceful_cut']) ? $attr['graceful_cut'] : 0;
+        $cut  = $attr['cut_string']   ?? 0;
+        $gcut = $attr['graceful_cut'] ?? 0;
         if ($cut) {
             $attr['cut_string'] = 0;
         }
         if ($gcut) {
             $attr['graceful_cut'] = 0;
         }
-        $full = $core->tpl->getFilters($attr);
+        $full = dcCore::app()->tpl->getFilters($attr);
 
         // Restore args
         if ($cut) {
@@ -79,30 +77,33 @@ class gracefulCut
             $attr['graceful_cut'] = $gcut;
         }
 
-        return '<?php if (strlen(' . sprintf($full, '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
-        'strlen(' . sprintf($short, '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
-            $content .
-            '<?php endif; ?>';
-
         if (!empty($attr['full'])) {
-            return '<?php if (strlen(' . sprintf($full,
-                    '$_ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen($_ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
-                'strlen(' . sprintf($short,
-                    '$_ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen($_ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
-                $content .
-                '<?php endif; ?>';
-        } else {
-            return '<?php if (strlen(' . sprintf($full,
-                    '$_ctx->posts->getContent(' . $urls . ')') . ') > ' .
-                'strlen(' . sprintf($short,
-                    '$_ctx->posts->getContent(' . $urls . ')') . ')) : ?>' .
+            return '<?php if (strlen(' . sprintf(
+                $full,
+                'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+            ) . ') > ' .
+                'strlen(' . sprintf(
+                    $short,
+                    'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+                ) . ')) : ?>' .
                 $content .
                 '<?php endif; ?>';
         }
+
+        return '<?php if (strlen(' . sprintf(
+            $full,
+            'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+        ) . ') > ' .
+                'strlen(' . sprintf(
+                    $short,
+                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+                ) . ')) : ?>' .
+                $content .
+                '<?php endif; ?>';
     }
 
     /**
@@ -117,7 +118,8 @@ class gracefulCut
      *
      * @return string Trimmed string.
      */
-    private static function graceful_cut($str,
+    private static function graceful_cut(
+        $str,
         $l = 100,
         $html = true,
         $ending = '<span class="ellipsis">&nbsp;[&#8230;]</span>',
@@ -125,11 +127,11 @@ class gracefulCut
     ) {
         if ($html) {
             // if the plain text is shorter than the maximum length, return the whole text
-            if (strlen(preg_replace('/<.*?>/', '', $str)) <= $l) {
+            if (strlen(preg_replace('/<.*?>/', '', (string) $str)) <= $l) {
                 return $str;
             }
             // splits all html-tags to scanable lines
-            preg_match_all('/(<.+?>)?([^<>]*)/s', $str, $lines, PREG_SET_ORDER);
+            preg_match_all('/(<.+?>)?([^<>]*)/s', (string) $str, $lines, PREG_SET_ORDER);
             $total_length = strlen($ending);
             $open_tags    = [];
             $truncate     = '';
@@ -140,14 +142,14 @@ class gracefulCut
                     if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])) {
                         // do nothing
                         // if tag is a closing tag
-                    } else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+                    } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
                         // delete tag from $open_tags list
                         $pos = array_search($tag_matchings[1], $open_tags);
                         if ($pos !== false) {
                             unset($open_tags[$pos]);
                         }
-                        // if tag is an opening tag
-                    } else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+                    // if tag is an opening tag
+                    } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                         // add tag to the beginning of $open_tags list
                         array_unshift($open_tags, strtolower($tag_matchings[1]));
                     }
@@ -155,7 +157,7 @@ class gracefulCut
                     $truncate .= $line_matchings[1];
                 }
                 // calculate the length of the plain text part of the line; handle entities as one character
-                $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+                $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', (string) $line_matchings[2]));
                 if ($total_length + $content_length > $l) {
                     // the number of characters which are left
                     $left            = $l - $total_length;
@@ -176,10 +178,10 @@ class gracefulCut
                     $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
                     // maximum lenght is reached, so get off the loop
                     break;
-                } else {
-                    $truncate .= $line_matchings[2];
-                    $total_length += $content_length;
                 }
+                $truncate .= $line_matchings[2];
+                $total_length += $content_length;
+
                 // if the maximum length is reached, get off the loop
                 if ($total_length >= $l) {
                     break;
@@ -188,15 +190,14 @@ class gracefulCut
         } else {
             if (strlen($str) <= $l) {
                 return $str;
-            } else {
-                $truncate = substr($str, 0, $l - strlen($ending));
             }
+            $truncate = substr($str, 0, $l - strlen($ending));
         }
         // if the words shouldn't be cut in the middle...
         if (!$exact) {
             // ...search the last occurance of a space...
             $spacepos = strrpos($truncate, ' ');
-            if (isset($spacepos)) {
+            if ($spacepos !== false) {
                 // ...and cut the text in this position
                 $truncate = substr($truncate, 0, $spacepos);
             }
@@ -209,6 +210,7 @@ class gracefulCut
                 $truncate .= '</' . $tag . '>';
             }
         }
+
         return $truncate;
     }
 }
