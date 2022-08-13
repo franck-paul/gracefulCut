@@ -1,11 +1,11 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="gracefulCut">
     <name>gracefulCut</name>
-    <version>0.3.1</version>
+    <version>0.4</version>
     <author>Franck Paul</author>
     <desc>Gracefully cut_string filter alternative for Dotclear templates</desc>
-    <file>https://github.com/franck-paul/gracefulCut/releases/download/0.3.1/plugin-gracefulCut-0.3.1.zip</file>
-    <da:dcmin>2.15</da:dcmin>
+    <file>https://github.com/franck-paul/gracefulCut/releases/download/0.4/plugin-gracefulCut-0.4.zip</file>
+    <da:dcmin>2.23</da:dcmin>
     <da:details>https://open-time.net/?q=gracefulCut</da:details>
     <da:support>https://github.com/franck-paul/gracefulCut</da:support>
   </module>
