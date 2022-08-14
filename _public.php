@@ -21,7 +21,7 @@ dcCore::app()->tpl->addBlock('IfGracefulCut', ['gracefulCut', 'IfGracefulCut']);
 
 class gracefulCut
 {
-    public static function publicContentFilter($core = null, $tag, $args, $filter)
+    public static function publicContentFilter($core, $tag, $args, $filter)
     {
         if ($filter == 'cut_string') {
             // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
@@ -36,7 +36,7 @@ class gracefulCut
         }
     }
 
-    public static function publicAfterContentFilter($core = null, $tag, $args)
+    public static function publicAfterContentFilter($core, $tag, $args)
     {
         if (isset($args['graceful_cut']) && (int) $args['graceful_cut'] > 0) {
             // graceful_cut attribute in tag
