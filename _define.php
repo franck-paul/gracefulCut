@@ -15,17 +15,19 @@ if (!defined('DC_RC_PATH')) {
 }
 
 $this->registerModule(
-    'gracefulCut',                                                     // Name
-    'Gracefully cut_string filter alternative for Dotclear templates', // Description
-    'Franck Paul',                                                     // Author
-    '0.4.1',
+    'gracefulCut',
+    'Gracefully cut_string filter alternative for Dotclear templates',
+    'Franck Paul',
+    '1.0',
     [
-        'requires'    => [['core', '2.23']],
-        'permissions' => 'admin',
-        'type'        => 'plugin',
+        'requires'    => [['core', '2.24']],
+        'permissions' => dcCore::app()->auth->makePermissions([
+            dcAuth::PERMISSION_ADMIN,
+        ]),
+        'type' => 'plugin',
 
-        'details'    => 'https://open-time.net/?q=gracefulCut',       // Details URL
-        'support'    => 'https://github.com/franck-paul/gracefulCut', // Support URL
+        'details'    => 'https://open-time.net/?q=gracefulCut',
+        'support'    => 'https://github.com/franck-paul/gracefulCut',
         'repository' => 'https://raw.githubusercontent.com/franck-paul/gracefulCut/master/dcstore.xml',
     ]
 );
