@@ -10,97 +10,12 @@
  * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return;
-}
+declare(strict_types=1);
 
-class gracefulCut
+namespace Dotclear\Plugin\gracefulCut;
+
+class FrontendHelper
 {
-    public static function publicContentFilter($tag, $args, $filter)
-    {
-        if ($filter == 'cut_string') {
-            // graceful_cut take place of cut_string, but only if no encode_xml or encode_html
-            if (isset($args['cut_string']) && (int) $args['cut_string'] > 0) {
-                if ((!isset($args['encode_xml']) || (int) $args['encode_xml'] == 0) && (!isset($args['encode_html']) || (int) $args['encode_html'] == 0)) {
-                    // graceful_cut with cut_string length
-                    $args[0] = self::graceful_cut($args[0], (int) $args['cut_string'], true);
-                    // then stop applying default cut_string filter
-                    return '1';
-                }
-            }
-        }
-    }
-
-    public static function publicAfterContentFilter($tag, $args)
-    {
-        if (isset($args['graceful_cut']) && (int) $args['graceful_cut'] > 0) {
-            // graceful_cut attribute in tag
-            $args[0] = self::graceful_cut($args[0], (int) $args['graceful_cut'], true);
-        }
-    }
-
-    public static function IfGracefulCut($attr, $content)
-    {
-        if (empty($attr['cut_string']) && empty($attr['graceful_cut'])) {
-            return '';
-        }
-
-        $urls = '0';
-        if (!empty($attr['absolute_urls'])) {
-            $urls = '1';
-        }
-
-        // Get short version of content
-        $short = dcCore::app()->tpl->getFilters($attr);
-
-        // Get full version of content
-        $cut  = $attr['cut_string']   ?? 0;
-        $gcut = $attr['graceful_cut'] ?? 0;
-        if ($cut) {
-            $attr['cut_string'] = 0;
-        }
-        if ($gcut) {
-            $attr['graceful_cut'] = 0;
-        }
-        $full = dcCore::app()->tpl->getFilters($attr);
-
-        // Restore args
-        if ($cut) {
-            $attr['cut_string'] = $cut;
-        }
-        if ($gcut) {
-            $attr['graceful_cut'] = $gcut;
-        }
-
-        if (!empty($attr['full'])) {
-            return '<?php if (strlen(' . sprintf(
-                $full,
-                'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
-            ) . ') > ' .
-                'strlen(' . sprintf(
-                    $short,
-                    'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
-                ) . ')) : ?>' .
-                $content .
-                '<?php endif; ?>';
-        }
-
-        return '<?php if (strlen(' . sprintf(
-            $full,
-            'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
-        ) . ') > ' .
-                'strlen(' . sprintf(
-                    $short,
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
-                ) . ')) : ?>' .
-                $content .
-                '<?php endif; ?>';
-    }
-
     /**
      * graceful_cut can truncate a string up to a number of characters while preserving whole words and HTML tags
      * Author: Alan Whipple (http://alanwhipple.com/2011/05/25/php-truncate-string-preserving-html-tags-words/)
@@ -113,7 +28,7 @@ class gracefulCut
      *
      * @return string Trimmed string.
      */
-    private static function graceful_cut(
+    public static function graceful_cut(
         $str,
         $l = 100,
         $html = true,
@@ -143,7 +58,7 @@ class gracefulCut
                         if ($pos !== false) {
                             unset($open_tags[$pos]);
                         }
-                    // if tag is an opening tag
+                        // if tag is an opening tag
                     } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                         // add tag to the beginning of $open_tags list
                         array_unshift($open_tags, strtolower($tag_matchings[1]));
@@ -209,8 +124,3 @@ class gracefulCut
         return $truncate;
     }
 }
-
-dcCore::app()->addBehavior('publicContentFilterV2', [gracefulCut::class, 'publicContentFilter']);
-dcCore::app()->addBehavior('publicAfterContentFilterV2', [gracefulCut::class, 'publicAfterContentFilter']);
-
-dcCore::app()->tpl->addBlock('IfGracefulCut', [gracefulCut::class, 'IfGracefulCut']);
