@@ -15,30 +15,27 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\gracefulCut;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 
-class Frontend extends dcNsProcess
+class Frontend extends Process
 {
-    protected static $init = false; /** @deprecated since 2.27 */
     public static function init(): bool
     {
-        static::$init = My::checkContext(My::FRONTEND);
-
-        return static::$init;
+        return self::status(My::checkContext(My::FRONTEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
         dcCore::app()->addBehaviors([
-            'publicContentFilterV2'      => [FrontendBehaviors::class, 'publicContentFilter'],
-            'publicAfterContentFilterV2' => [FrontendBehaviors::class, 'publicAfterContentFilter'],
+            'publicContentFilterV2'      => FrontendBehaviors::publicContentFilter(...),
+            'publicAfterContentFilterV2' => FrontendBehaviors::publicAfterContentFilter(...),
         ]);
 
-        dcCore::app()->tpl->addBlock('IfGracefulCut', [FrontendTemplate::class, 'IfGracefulCut']);
+        dcCore::app()->tpl->addBlock('IfGracefulCut', FrontendTemplate::IfGracefulCut(...));
 
         return true;
     }
