@@ -18,7 +18,7 @@ $this->registerModule(
     'gracefulCut',
     'Gracefully cut_string filter alternative for Dotclear templates',
     'Franck Paul',
-    '2.1.1',
+    '3.0',
     [
         'requires'    => [['core', '2.24']],
         'permissions' => dcCore::app()->auth->makePermissions([
