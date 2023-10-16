@@ -20,21 +20,21 @@ class FrontendHelper
      * graceful_cut can truncate a string up to a number of characters while preserving whole words and HTML tags
      * Author: Alan Whipple (http://alanwhipple.com/2011/05/25/php-truncate-string-preserving-html-tags-words/)
      *
-     * @param string $str String to truncate.
-     * @param integer $l Length of returned string, including ellipsis.
-     * @param boolean $html If true, HTML tags would be handled correctly
-     * @param string $ending Ending to be appended to the trimmed string.
-     * @param boolean $exact If false, $str will not be cut mid-word
+     * @param string    $str        String to truncate.
+     * @param int       $l          Length of returned string, including ellipsis.
+     * @param bool      $html       If true, HTML tags would be handled correctly
+     * @param string    $ending     Ending to be appended to the trimmed string.
+     * @param bool      $exact      If false, $str will not be cut mid-word
      *
      * @return string Trimmed string.
      */
     public static function graceful_cut(
-        $str,
-        $l = 100,
-        $html = true,
-        $ending = '<span class="ellipsis">&nbsp;[&#8230;]</span>',
-        $exact = false
-    ) {
+        string $str,
+        int $l = 100,
+        bool $html = true,
+        string $ending = '<span class="ellipsis">&nbsp;[&#8230;]</span>',
+        bool $exact = false
+    ): string {
         if ($html) {
             // if the plain text is shorter than the maximum length, return the whole text
             if (strlen(preg_replace('/<.*?>/', '', (string) $str)) <= $l) {
@@ -86,6 +86,7 @@ class FrontendHelper
                         }
                     }
                     $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
+
                     // maximum lenght is reached, so get off the loop
                     break;
                 }

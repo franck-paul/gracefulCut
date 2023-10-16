@@ -14,11 +14,18 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\gracefulCut;
 
+use ArrayObject;
 use dcCore;
 
 class FrontendTemplate
 {
-    public static function IfGracefulCut($attr, $content)
+    /**
+     * @param      array<string, mixed>|\ArrayObject<string, mixed>  $attr      The attribute
+     * @param      string                                            $content   The content
+     *
+     * @return     string
+     */
+    public static function IfGracefulCut(array|ArrayObject $attr, string $content): string
     {
         if (empty($attr['cut_string']) && empty($attr['graceful_cut'])) {
             return '';
