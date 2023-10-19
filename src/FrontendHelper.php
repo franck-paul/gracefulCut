@@ -37,7 +37,7 @@ class FrontendHelper
     ): string {
         if ($html) {
             // if the plain text is shorter than the maximum length, return the whole text
-            if (strlen(preg_replace('/<.*?>/', '', (string) $str)) <= $l) {
+            if (strlen((string) preg_replace('/<.*?>/', '', (string) $str)) <= $l) {
                 return $str;
             }
             // splits all html-tags to scanable lines
@@ -67,7 +67,7 @@ class FrontendHelper
                     $truncate .= $line_matchings[1];
                 }
                 // calculate the length of the plain text part of the line; handle entities as one character
-                $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', ' ', (string) $line_matchings[2]));
+                $content_length = strlen((string) preg_replace('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', ' ', (string) $line_matchings[2]));
                 if ($total_length + $content_length > $l) {
                     // the number of characters which are left
                     $left            = $l - $total_length;
