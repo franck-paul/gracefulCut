@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\gracefulCut;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 
 class FrontendTemplate
 {
@@ -37,7 +37,7 @@ class FrontendTemplate
         }
 
         // Get short version of content
-        $short = dcCore::app()->tpl->getFilters($attr);
+        $short = App::frontend()->template()->getFilters($attr);
 
         // Get full version of content
         $cut  = $attr['cut_string']   ?? 0;
@@ -48,7 +48,7 @@ class FrontendTemplate
         if ($gcut) {
             $attr['graceful_cut'] = 0;
         }
-        $full = dcCore::app()->tpl->getFilters($attr);
+        $full = App::frontend()->template()->getFilters($attr);
 
         // Restore args
         if ($cut) {
@@ -61,15 +61,15 @@ class FrontendTemplate
         if (!empty($attr['full'])) {
             return '<?php if (strlen(' . sprintf(
                 $full,
-                'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+                'App::frontend()->context()->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen(App::frontend()->context()->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
             ) . ') > ' .
                 'strlen(' . sprintf(
                     $short,
-                    'dcCore::app()->ctx->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(dcCore::app()->ctx->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+                    'App::frontend()->context()->posts->getExcerpt(' . $urls . ').' .
+                    '(strlen(App::frontend()->context()->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
+                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
                 ) . ')) : ?>' .
                 $content .
                 '<?php endif; ?>';
@@ -77,11 +77,11 @@ class FrontendTemplate
 
         return '<?php if (strlen(' . sprintf(
             $full,
-            'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+            'App::frontend()->context()->posts->getContent(' . $urls . ')'
         ) . ') > ' .
                 'strlen(' . sprintf(
                     $short,
-                    'dcCore::app()->ctx->posts->getContent(' . $urls . ')'
+                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
                 ) . ')) : ?>' .
                 $content .
                 '<?php endif; ?>';

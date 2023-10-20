@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\gracefulCut;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
 class Frontend extends Process
@@ -30,12 +30,12 @@ class Frontend extends Process
             return false;
         }
 
-        dcCore::app()->addBehaviors([
+        App::behavior()->addBehaviors([
             'publicContentFilterV2'      => FrontendBehaviors::publicContentFilter(...),
             'publicAfterContentFilterV2' => FrontendBehaviors::publicAfterContentFilter(...),
         ]);
 
-        dcCore::app()->tpl->addBlock('IfGracefulCut', FrontendTemplate::IfGracefulCut(...));
+        App::frontend()->template()->addBlock('IfGracefulCut', FrontendTemplate::IfGracefulCut(...));
 
         return true;
     }
