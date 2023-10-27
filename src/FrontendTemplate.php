@@ -45,15 +45,18 @@ class FrontendTemplate
         if ($cut) {
             $attr['cut_string'] = 0;
         }
+
         if ($gcut) {
             $attr['graceful_cut'] = 0;
         }
+
         $full = App::frontend()->template()->getFilters($attr);
 
         // Restore args
         if ($cut) {
             $attr['cut_string'] = $cut;
         }
+
         if ($gcut) {
             $attr['graceful_cut'] = $gcut;
         }
