@@ -22,6 +22,6 @@ $this->registerModule(
 
         'details'    => 'https://open-time.net/?q=gracefulCut',
         'support'    => 'https://github.com/franck-paul/gracefulCut',
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/gracefulCut/master/dcstore.xml',
+        'repository' => 'https://raw.githubusercontent.com/franck-paul/gracefulCut/main/dcstore.xml',
     ]
 );
