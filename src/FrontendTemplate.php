@@ -17,6 +17,7 @@ namespace Dotclear\Plugin\gracefulCut;
 
 use ArrayObject;
 use Dotclear\App;
+use Dotclear\Plugin\TemplateHelper\Code;
 
 class FrontendTemplate
 {
@@ -30,62 +31,41 @@ class FrontendTemplate
             return '';
         }
 
-        $urls = '0';
-        if (!empty($attr['absolute_urls'])) {
-            $urls = '1';
-        }
+        // Get short version of attributes
+        $params_short = App::frontend()->template()->getFiltersParams($attr);
 
-        // Get short version of content
-        $short = App::frontend()->template()->getFilters($attr);
-
-        // Get full version of content
-        $cut  = $attr['cut_string']   ?? 0;
-        $gcut = $attr['graceful_cut'] ?? 0;
+        // Get full version of attributes
+        $cut         = $attr['cut_string']   ?? 0;
+        $gracefulcut = $attr['graceful_cut'] ?? 0;
         if ($cut) {
             $attr['cut_string'] = 0;
         }
 
-        if ($gcut) {
+        if ($gracefulcut) {
             $attr['graceful_cut'] = 0;
         }
 
-        $full = App::frontend()->template()->getFilters($attr);
+        $params_full = App::frontend()->template()->getFiltersParams($attr);
 
         // Restore args
         if ($cut) {
             $attr['cut_string'] = $cut;
         }
 
-        if ($gcut) {
-            $attr['graceful_cut'] = $gcut;
+        if ($gracefulcut) {
+            $attr['graceful_cut'] = $gracefulcut;
         }
 
-        if (!empty($attr['full'])) {
-            return '<?php if (strlen(' . sprintf(
-                $full,
-                'App::frontend()->context()->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(App::frontend()->context()->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
-            ) . ') > ' .
-                'strlen(' . sprintf(
-                    $short,
-                    'App::frontend()->context()->posts->getExcerpt(' . $urls . ').' .
-                    '(strlen(App::frontend()->context()->posts->getExcerpt(' . $urls . ')) ? " " : "").' .
-                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
-                ) . ')) : ?>' .
-                $content .
-                '<?php endif; ?>';
-        }
-
-        return '<?php if (strlen(' . sprintf(
-            $full,
-            'App::frontend()->context()->posts->getContent(' . $urls . ')'
-        ) . ') > ' .
-                'strlen(' . sprintf(
-                    $short,
-                    'App::frontend()->context()->posts->getContent(' . $urls . ')'
-                ) . ')) : ?>' .
-                $content .
-                '<?php endif; ?>';
+        return Code::getPHPCode(
+            FrontendTemplateCode::IfGracefulCut(...),
+            [
+                !empty($attr['absolute_urls']),
+                !empty($attr['full']),
+                $content,
+                $params_short,
+                $params_full,
+                App::frontend()->template()->getCurrentTag(),
+            ],
+        );
     }
 }
