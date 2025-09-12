@@ -37,8 +37,8 @@ class FrontendTemplateCode
             $_full_ ? App::frontend()->context()->posts->getExcerpt($_absolute_urls_) : '',
             App::frontend()->context()->posts->getContent($_absolute_urls_),
         ]));
-        $graceful_cut_buffer_short = \Dotclear\Core\Frontend\Ctx::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
-        $graceful_cut_buffer_full  = \Dotclear\Core\Frontend\Ctx::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
+        $graceful_cut_buffer_short = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
+        $graceful_cut_buffer_full  = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
         if (mb_strlen($graceful_cut_buffer_full) > mb_strlen($graceful_cut_buffer_short)) : ?>
             $_content_HTML
         <?php endif;
