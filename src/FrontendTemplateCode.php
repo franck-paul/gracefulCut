@@ -39,7 +39,7 @@ class FrontendTemplateCode
         ]));
         $graceful_cut_buffer_short = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
         $graceful_cut_buffer_full  = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
-        if (mb_strlen($graceful_cut_buffer_full) > mb_strlen($graceful_cut_buffer_short)) : ?>
+        if (mb_strlen((string) $graceful_cut_buffer_full) > mb_strlen((string) $graceful_cut_buffer_short)) : ?>
             $_content_HTML
         <?php endif;
         unset($graceful_cut_buffer, $graceful_cut_buffer_short, $graceful_cut_buffer_full);
