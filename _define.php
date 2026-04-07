@@ -15,9 +15,9 @@ $this->registerModule(
     'gracefulCut',
     'Gracefully cut_string filter alternative for Dotclear templates',
     'Franck Paul',
-    '6.2',
+    '6.3',
     [
-        'date'     => '2025-10-11T10:42:18+0200',
+        'date'     => '2026-04-07T13:32:57+0200',
         'requires' => [
             ['core', '2.36'],
             ['TemplateHelper'],
