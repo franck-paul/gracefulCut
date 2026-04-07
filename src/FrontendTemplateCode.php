@@ -33,15 +33,16 @@ class FrontendTemplateCode
         array $_params_full_,
         string $_tag_
     ): void {
-        $graceful_cut_buffer = implode(' ', array_filter([
-            $_full_ ? App::frontend()->context()->posts->getExcerpt($_absolute_urls_) : '',
-            App::frontend()->context()->posts->getContent($_absolute_urls_),
-        ]));
-        $graceful_cut_buffer_short = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
-        $graceful_cut_buffer_full  = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
-        if (mb_strlen((string) $graceful_cut_buffer_full) > mb_strlen((string) $graceful_cut_buffer_short)) : ?>
+        if (App::frontend()->context()->posts instanceof \Dotclear\Database\MetaRecord) {
+            $graceful_cut_excerpt      = $_full_ && is_string($graceful_cut_excerpt = App::frontend()->context()->posts->getExcerpt($_absolute_urls_)) ? $graceful_cut_excerpt : '';
+            $graceful_cut_content      = is_string($graceful_cut_content = App::frontend()->context()->posts->getExcerpt($_absolute_urls_)) ? $graceful_cut_content : '';
+            $graceful_cut_buffer       = implode(' ', array_filter([$graceful_cut_excerpt, $graceful_cut_content]));
+            $graceful_cut_buffer_short = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
+            $graceful_cut_buffer_full  = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
+            if (mb_strlen((string) $graceful_cut_buffer_full) > mb_strlen((string) $graceful_cut_buffer_short)) : ?>
             $_content_HTML
         <?php endif;
-        unset($graceful_cut_buffer, $graceful_cut_buffer_short, $graceful_cut_buffer_full);
+            unset($graceful_cut_excerpt, $graceful_cut_content, $graceful_cut_buffer, $graceful_cut_buffer_short, $graceful_cut_buffer_full);
+        }
     }
 }
