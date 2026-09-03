@@ -36,6 +36,7 @@ class FrontendHelper
         string $ending = '<span class="ellipsis">&nbsp;[&#8230;]</span>',
         bool $exact = false
     ): string {
+        $open_tags = [];
         if ($html) {
             // if the plain text is shorter than the maximum length, return the whole text
             if (strlen((string) preg_replace('/<.*?>/', '', $str)) <= $l) {
@@ -45,15 +46,14 @@ class FrontendHelper
             // splits all html-tags to scanable lines
             preg_match_all('/(<.+?>)?([^<>]*)/s', $str, $lines, PREG_SET_ORDER);
             $total_length = strlen($ending);
-            $open_tags    = [];
             $truncate     = '';
-            foreach ($lines as $line_matchings) {
+            foreach ($lines as $line) {
                 // if there is any html-tag in this line, handle it and add it (uncounted) to the output
                 // if it's an "empty element" with or without html-conform closing slash
-                if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])) {
+                if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line[1])) {
                     // do nothing
                     // if tag is a closing tag
-                } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+                } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line[1], $tag_matchings)) {
                     // delete tag from $open_tags list
                     $pos = array_search($tag_matchings[1], $open_tags, true);
                     if ($pos !== false) {
@@ -61,22 +61,22 @@ class FrontendHelper
                     }
 
                     // if tag is an opening tag
-                } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+                } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line[1], $tag_matchings)) {
                     // add tag to the beginning of $open_tags list
                     array_unshift($open_tags, strtolower($tag_matchings[1]));
                 }
 
                 // add html-tag to $truncate'd text
-                $truncate .= $line_matchings[1];
+                $truncate .= $line[1];
 
                 // calculate the length of the plain text part of the line; handle entities as one character
-                $content_length = strlen((string) preg_replace('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+                $content_length = strlen((string) preg_replace('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', ' ', $line[2]));
                 if ($total_length + $content_length > $l) {
                     // the number of characters which are left
                     $left            = $l - $total_length;
                     $entities_length = 0;
                     // search for html entities
-                    if (preg_match_all('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', $line_matchings[2], $entities, PREG_OFFSET_CAPTURE)) {
+                    if (preg_match_all('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', $line[2], $entities, PREG_OFFSET_CAPTURE)) {
                         // calculate the real length of all entities in the legal range
                         foreach ($entities[0] as $entity) {
                             if ($entity[1] + 1 - $entities_length <= $left) {
@@ -89,13 +89,13 @@ class FrontendHelper
                         }
                     }
 
-                    $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
+                    $truncate .= substr($line[2], 0, $left + $entities_length);
 
                     // maximum lenght is reached, so get off the loop
                     break;
                 }
 
-                $truncate .= $line_matchings[2];
+                $truncate .= $line[2];
                 $total_length += $content_length;
 
                 // if the maximum length is reached, get off the loop
@@ -125,8 +125,8 @@ class FrontendHelper
         $truncate .= $ending;
         if ($html) {
             // close all unclosed html-tags
-            foreach ($open_tags as $tag) {
-                $truncate .= '</' . $tag . '>';
+            foreach ($open_tags as $open_tag) {
+                $truncate .= '</' . $open_tag . '>';
             }
         }
 
