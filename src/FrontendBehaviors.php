@@ -32,6 +32,7 @@ class FrontendBehaviors
                 && (!isset($args['encode_html']) || (int) $args['encode_html'] === 0))
         ) {
             // graceful_cut with cut_string length
+            // @phpstan-ignore assign.unused
             $args[0] = FrontendHelper::graceful_cut($args[0], (int) $args['cut_string'], true);
 
             // then stop applying default cut_string filter
@@ -49,6 +50,7 @@ class FrontendBehaviors
     {
         if (isset($args['graceful_cut']) && (int) $args['graceful_cut'] > 0) {
             // graceful_cut attribute in tag
+            // @phpstan-ignore assign.unused
             $args[0] = FrontendHelper::graceful_cut($args[0], (int) $args['graceful_cut'], true);
         }
 
