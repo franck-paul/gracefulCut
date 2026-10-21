@@ -34,9 +34,12 @@ class FrontendTemplateCode
         string $_tag_
     ): void {
         if (App::frontend()->context()->posts instanceof \Dotclear\Database\MetaRecord) {
-            $graceful_cut_excerpt      = $_full_ ? App::frontend()->context()->posts->getExcerpt($_absolute_urls_) : '';
-            $graceful_cut_content      = App::frontend()->context()->posts->getExcerpt($_absolute_urls_);
-            $graceful_cut_buffer       = implode(' ', array_filter([$graceful_cut_excerpt, $graceful_cut_content]));
+            $graceful_cut_excerpt = $_full_ ? App::frontend()->context()->posts->getExcerpt($_absolute_urls_) : '';
+            $graceful_cut_content = App::frontend()->context()->posts->getExcerpt($_absolute_urls_);
+            $graceful_cut_buffer  = implode(' ', array_filter(
+                [$graceful_cut_excerpt, $graceful_cut_content],
+                fn ($v): bool => !empty($v)
+            ));
             $graceful_cut_buffer_short = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_short_, $_tag_);
             $graceful_cut_buffer_full  = App::frontend()->context()::global_filters($graceful_cut_buffer, $_params_full_, $_tag_);
             if (mb_strlen((string) $graceful_cut_buffer_full) > mb_strlen((string) $graceful_cut_buffer_short)) : ?>
