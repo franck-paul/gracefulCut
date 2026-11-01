@@ -35,25 +35,25 @@ class FrontendTemplate
         $params_short = App::frontend()->template()->getFiltersParams($attr);
 
         // Get full version of attributes
-        $cut         = $attr['cut_string']   ?? 0;
-        $gracefulcut = $attr['graceful_cut'] ?? 0;
-        if ($cut) {
+        $cut_string = isset($attr['cut_string']) && is_numeric($cut_string = $attr['cut_string']) ? (int) $cut_string : 0;
+        if ($cut_string === 1) {
             $attr['cut_string'] = 0;
         }
 
-        if ($gracefulcut) {
+        $graceful_cut = isset($attr['graceful_cut']) && is_numeric($graceful_cut = $attr['graceful_cut']) ? (int) $graceful_cut : 0;
+        if ($graceful_cut === 1) {
             $attr['graceful_cut'] = 0;
         }
 
         $params_full = App::frontend()->template()->getFiltersParams($attr);
 
         // Restore args
-        if ($cut) {
-            $attr['cut_string'] = $cut;
+        if ($cut_string === 1) {
+            $attr['cut_string'] = $cut_string;
         }
 
-        if ($gracefulcut) {
-            $attr['graceful_cut'] = $gracefulcut;
+        if ($graceful_cut === 1) {
+            $attr['graceful_cut'] = $graceful_cut;
         }
 
         return Code::getPHPCode(

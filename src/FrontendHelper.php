@@ -50,10 +50,10 @@ class FrontendHelper
             foreach ($lines as $line) {
                 // if there is any html-tag in this line, handle it and add it (uncounted) to the output
                 // if it's an "empty element" with or without html-conform closing slash
-                if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line[1])) {
+                if ((bool) preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line[1])) {
                     // do nothing
                     // if tag is a closing tag
-                } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line[1], $tag_matchings)) {
+                } elseif ((bool) preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line[1], $tag_matchings)) {
                     // delete tag from $open_tags list
                     $pos = array_search($tag_matchings[1], $open_tags, true);
                     if ($pos !== false) {
@@ -61,7 +61,7 @@ class FrontendHelper
                     }
 
                     // if tag is an opening tag
-                } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line[1], $tag_matchings)) {
+                } elseif ((bool) preg_match('/^<\s*([^\s>!]+).*?>$/s', $line[1], $tag_matchings)) {
                     // add tag to the beginning of $open_tags list
                     array_unshift($open_tags, strtolower($tag_matchings[1]));
                 }
@@ -76,7 +76,7 @@ class FrontendHelper
                     $left            = $l - $total_length;
                     $entities_length = 0;
                     // search for html entities
-                    if (preg_match_all('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', $line[2], $entities, PREG_OFFSET_CAPTURE)) {
+                    if ((bool) preg_match_all('/&[0-9a-z]{2,8};|&#\d{1,7};|[0-9a-f]{1,6};/i', $line[2], $entities, PREG_OFFSET_CAPTURE)) {
                         // calculate the real length of all entities in the legal range
                         foreach ($entities[0] as $entity) {
                             if ($entity[1] + 1 - $entities_length <= $left) {
