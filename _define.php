@@ -18,9 +18,9 @@ if (isset($this) && is_object($this) && method_exists($this, 'registerModule') &
         'gracefulCut',
         'Gracefully cut_string filter alternative for Dotclear templates',
         'Franck Paul',
-        '7.0',
+        '7.1',
         [
-            'date'     => '2026-08-03T09:58:14+0200',
+            'date'     => '2026-11-07T16:53:33+0100',
             'requires' => [
                 ['core', '2.39'],
                 ['TemplateHelper'],
